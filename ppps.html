@@ -1,0 +1,35 @@
+<!doctype html>
+<script>
+  function writeln(s){document.write(`<li>${s}</li>`);}
+  prot = `ws${location.protocol.substr(4)}`;
+  loc = `${prot}//${location.host}/ps/`;
+  app = new WebSocket(loc);
+  app.onopen =function(e){writeln("OO");
+			  app.state=0;app.onconnect(e);};
+  app.onclose=function(e){writeln("CC");};
+  app.onerror=function(e){writeln("EE");};
+  app.onmessage=function(e){
+      console.log("QQQ", e.data, "ZZZ");
+      var arr = e.data.split(";", 3);
+      console.log("QQQ", arr, "ZZZ");
+      e.ttl = arr[0];
+      e.channel = arr[1];
+      e.message = arr[2];
+      if(!app.myid)
+	  app.myid = arr[1];
+      return app.onpub(e);}
+  app.sub = function(chn){    app.send("0;+;"+chn);};
+  app.unsub=function(chn){    app.send("0;-;"+chn);};
+  app.pub = function(chn,msg){app.send("3;" + chn+";"+msg);};
+  app.onconnect=function(e){
+      app.sub("main");
+      app.sub("weird");
+      app.pub("main", "yo world");
+  };
+  app.onpub=function(e){
+      writeln("I:" + app.myid);
+      writeln("C:" + e.channel);
+      writeln("D:" + e.data);
+      writeln("M:" + e.message);
+  };
+</script>
