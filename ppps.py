@@ -27,7 +27,10 @@ def pub(chn, msg, user = None, ttl=3):
 def sub(chn, user):
     Channels[chn] = Channels.get(chn, []) + [user]
 def uns(chn, user):
-    return Channels.get(chn, []).remove(user)
+    try:
+        return Channels.get(chn, []).remove(user)
+    except ValueError:
+        pass # do nothing
 def uns_all(user):
     [ uns(k, user) for k,v in Channels.items() ]
 def app(env, start):
